@@ -28,14 +28,7 @@ jobs:
       uses: ./
 
     - name: Check python-path
-      run: |
-        PATH_PYTHON=$(python -c 'import sys; print(sys.executable)')
-        SETUP_PYTHON=$('${{ steps.setup-python.outputs.python-path }}' -c 'import sys; print(sys.executable)')
-        if [ "${SETUP_PYTHON}" != "${PATH_PYTHON}" ]; then
-          echo "Executable mismatch. python in PATH is ${PATH_PYTHON}; python-path (${{ steps.setup-python.outputs.python-path }}) is ${SETUP_PYTHON}"
-          exit 1
-        fi
-        echo 'python-path: ${{ steps.setup-python.outputs.python-path }}'
+      run: ./__tests__/check-python-path.sh '${{ steps.setup-python.outputs.python-path }}'
       shell: bash
 
     - name: Validate version
@@ -63,14 +56,7 @@ jobs:
         python-version: ${{ matrix.python }}
 
     - name: Check python-path
-      run: |
-        PATH_PYTHON=$(python -c 'import sys; print(sys.executable)')
-        SETUP_PYTHON=$('${{ steps.setup-python.outputs.python-path }}' -c 'import sys; print(sys.executable)')
-        if [ "${SETUP_PYTHON}" != "${PATH_PYTHON}" ]; then
-          echo "Executable mismatch. python in PATH is ${PATH_PYTHON}; python-path (${{ steps.setup-python.outputs.python-path }}) is ${SETUP_PYTHON}"
-          exit 1
-        fi
-        echo 'python-path: ${{ steps.setup-python.outputs.python-path }}'
+      run: ./__tests__/check-python-path.sh '${{ steps.setup-python.outputs.python-path }}'
       shell: bash
 
     - name: Validate version
@@ -104,14 +90,7 @@ jobs:
         python-version: '3.9.0-beta.4'
 
     - name: Check python-path
-      run: |
-        PATH_PYTHON=$(python -c 'import sys; print(sys.executable)')
-        SETUP_PYTHON=$('${{ steps.setup-python.outputs.python-path }}' -c 'import sys; print(sys.executable)')
-        if [ "${SETUP_PYTHON}" != "${PATH_PYTHON}" ]; then
-          echo "Executable mismatch. python in PATH is ${PATH_PYTHON}; python-path (${{ steps.setup-python.outputs.python-path }}) is ${SETUP_PYTHON}"
-          exit 1
-        fi
-        echo 'python-path: ${{ steps.setup-python.outputs.python-path }}'
+      run: ./__tests__/check-python-path.sh '${{ steps.setup-python.outputs.python-path }}'
       shell: bash
 
     - name: Validate version
