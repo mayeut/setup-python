@@ -14,15 +14,43 @@ on:
   workflow_dispatch:
 
 jobs:
+  all-hosted-runners:
+    name: Get all hosted runners
+    runs-on: ubuntu-latest
+    outputs:
+      runners: ${{ steps.get.outputs.runners }}
+    steps:
+      - name: Get all hosted runners
+        id: get
+        run: |
+          $runners = @(
+              "macos-11"
+              "macos-12"
+              "macos-13"
+              "windows-2019"
+              "windows-2022"
+              "ubuntu-20.04"
+              "ubuntu-22.04"
+              "ubuntu-24.04"
+              ${{ github.repository == 'actions/setup-python' && '"setup-actions-ubuntu-arm64-2-core"' || '' }}
+              ${{ github.repository == 'actions/setup-python' && '"setup-actions-windows-arm64-4-core"' || '' }}
+          )
+          Write-Output "$runners"
+          $json = ConvertTo-Json $runners -Compress
+          Write-Output "runners=${json} to ${Env:GITHUB_OUTPUT}"
+          Write-Output "runners=${json}" | Out-File "${Env:GITHUB_OUTPUT}" -Append
+        shell: pwsh
+
   check-non-eol-available:  # non EOL versions of python shall be available on all workers
     name: non-eol ${{ matrix.python-version }} ${{ matrix.check-latest && 'latest' || '' }} ${{ matrix.os }}
+    needs: all-hosted-runners
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
         check-latest: [false, true]
-        os: [macos-11, macos-12, macos-13, macos-14, windows-2019, windows-2022, ubuntu-20.04, ubuntu-22.04, ubuntu-24.04, setup-actions-ubuntu-arm64-2-core, setup-actions-windows-arm64-4-core]
+        os: ${{ fromJson(needs.all-hosted-runners.outputs.runners) }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python ${{ matrix.check-latest && 'and check latest' || '' }}
